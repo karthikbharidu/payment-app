@@ -11,9 +11,9 @@ def register():
     data = request.get_json() # receives data and converts it from JSON to a Python dictionary.
 
     # Extracting individual values from that dictionary data['name'] means — "get the value with key 'name' from the received data"
-    name = data.get('name')
-    email= data.get('email')
-    password = data.get('password')
+    name = data.get('name').lower()
+    email= data.get('email').lower()
+    password = data.get('password').lower()
 
     if not name or not email or not password:
         return jsonify({"Error":"All fields are required"}), 400
@@ -39,8 +39,8 @@ def register():
 @auth.route('/login', methods = ["POST"])
 def login():
     data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
+    email = data.get('email').lower()
+    password = data.get('password').lower()
 
     user = User.query.filter_by(email = email).first()
 
