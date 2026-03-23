@@ -40,9 +40,18 @@ def transaction():
 @transactions.route('/transactions', methods= ["GET"])
 @jwt_required()
 def get_transactions():
-    txns = Transaction.query.all()
-    result = [txn.to_dict() for txn in txns]
-    return jsonify(result),200
+    page = request.args.get('page',1,type = int )
+    limit = request.args.get('limit', 10, type = int)
+    paginated = Transaction.query.paginate( page =page, per_page = limit, error_out = False )
+
+    
+    return jsonify({"users": [txn.to_dict() for txn in paginated.items],
+    'total_users':paginated.total,
+    'page':paginated.page,
+    'total_pages':paginated.page,
+    'has_next':paginated.has_next,
+    'has_previous':paginated.has_prev
+    }),200
 
 @transactions.route('/transactions/<int:id>', methods = ["GET"])
 @jwt_required()

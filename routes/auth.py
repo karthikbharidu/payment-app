@@ -14,6 +14,7 @@ def register():
     name = data.get('name').lower()
     email= data.get('email').lower()
     password = data.get('password').lower()
+    mobile = data.get("mobile")
 
     if not name or not email or not password:
         return jsonify({"Error":"All fields are required"}), 400
@@ -25,7 +26,7 @@ def register():
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     try:
-        new_user = User(name = name, email = email, password = hashed_password)
+        new_user = User(name = name, email = email, password = hashed_password, mobile = mobile)
         db.session.add(new_user)
         db.session.commit()
     

@@ -7,9 +7,18 @@ users = Blueprint('users', __name__)
 @users.route('/users', methods = ['GET'])
 @jwt_required()
 def get_details():
-    all_users = User.query.all()
-    result = [user.to_dict() for user in all_users]
-    return jsonify(result),200
+    page = request.args.get('page', 1, type = int)
+    limit = request.args.get('limit', 10, type = int)
+    
+    paginated = User.query.paginate(page = page, per_page = limit, error_out = False)
+    return jsonify({
+        'users':[user.to_dict() for user in paginated.items],
+        'total_users': paginated.total,
+        'page': paginated.page,
+        'total_pages':paginated.pages,
+        'has_next': paginated.has_next,
+        'has_previous': paginated.has_prev
+    }),200
 
 @users.route('/users/<int:id>', methods = ['GET'])
 @jwt_required()
