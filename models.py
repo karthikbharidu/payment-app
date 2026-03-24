@@ -9,6 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable = False, unique = True)
     password = db.Column(db.String(100), nullable = False)
     mobile = db.Column(db.String(50), nullable = False)
+    role = db.Column(db.String(100), nullable = False, default = 'user')
 
     def to_dict(self):
         return {
@@ -32,7 +33,6 @@ class Transaction(db.Model):
             'amount':self.amount,
             'status':self.amount,
             'timestamp':str(self.timestamp)
-        
         }
 
 class User_details(db.Model):

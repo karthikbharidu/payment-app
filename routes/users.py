@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
-from models import db, User
+from models import db, User,Transaction
 from flask_jwt_extended import jwt_required,get_jwt_identity
+from utils import admin_required
+from extensions import bcrypt
 
 users = Blueprint('users', __name__)
 
 @users.route('/users', methods = ['GET'])
 @jwt_required()
+@admin_required
 def get_details():
     page = request.args.get('page', 1, type = int)
     limit = request.args.get('limit', 10, type = int)
@@ -35,6 +38,12 @@ def get_user(id):
 def update_user(id):
     data = request.get_json()
     user = User.query.filter_by(id = id).first()
+    current_user_id = get_jwt_identity()
+    current_user = User.query.filter_by(id = current_user_id).first()
+
+    if current_user.role !='admin' and current_user_id !=str(id):
+        return jsonify({'Error':'Unauthorized'}), 403
+
 
     if not user:
         return jsonify({'Error':"Details not Found"}), 404
@@ -44,7 +53,8 @@ def update_user(id):
     if data.get('email'):
         user.email = data.get('email')
     if data.get('password'):
-        user.password = data.get('password')
+        hashed_password = bcrypt.generate_password_hash(data.get('password')).decode('utf-8')
+        user.password = hashed_password
 
     try:
         db.session.commit()
@@ -59,6 +69,7 @@ def update_user(id):
 
 @users.route('/users/<int:id>', methods = ["DELETE"])
 @jwt_required()
+@admin_required
 def delete_user(id):
     user = User.query.filter_by(id = id).first()
 
@@ -66,10 +77,12 @@ def delete_user(id):
         return jsonify({'Error':"Details not Found"}), 404
 
     try:
+        Transaction.query.filter_by(user_id = id).delete()
         db.session.delete(user)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
+        print(f"ERROR: {e}") 
         return jsonify({"Error":"Something Went Wrong"}), 500
 
 

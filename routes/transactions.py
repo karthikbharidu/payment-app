@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models import db, User, Transaction 
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from utils import admin_required
 
 transactions = Blueprint('transactions', __name__)
 
@@ -39,6 +40,7 @@ def transaction():
 
 @transactions.route('/transactions', methods= ["GET"])
 @jwt_required()
+@admin_required
 def get_transactions():
     page = request.args.get('page',1,type = int )
     limit = request.args.get('limit', 10, type = int)
