@@ -1,1 +1,9 @@
 Single-database configuration for Flask.
+## Live API
+Base URL: http://54.162.221.161:5000
+
+## Deployment
+- Deployed on AWS EC2 (Ubuntu 22.04)
+- Gunicorn production server
+- MySQL database
+- Managed by systemd service
