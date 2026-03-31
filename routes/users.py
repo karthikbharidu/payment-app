@@ -33,6 +33,7 @@ def get_user(id):
 
     return jsonify(user.to_dict()),200
 
+
 @users.route('/users/<int:id>', methods = ['PUT'])
 @jwt_required()
 def update_user(id):
